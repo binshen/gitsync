@@ -38,6 +38,8 @@ public class GitTest {
     public static void main(String args[]) {
 
         try {
+            resetTables();
+
             File dir = new File(base_path);
             File[] files = dir.listFiles();
             for (int i = 0; i < files.length; i++) {
@@ -105,11 +107,18 @@ public class GitTest {
         return sb.toString();
     }
 
+    public static void resetTables() throws SQLException {
+
+        Statement stmt = conn.createStatement();
+        stmt.execute("truncate table commits");
+        stmt.execute("truncate table projects");
+        stmt.close();
+    }
+
     public static long insertProject(String name, String folder) throws SQLException {
 
         Statement stmt = conn.createStatement();
         String sql = "INSERT INTO projects (name, folder) VALUES ('" + name + "','" + folder + "')";
-        System.out.println(sql);
         stmt.execute(sql);
         ResultSet rs = stmt.executeQuery("SELECT last_insert_id();");
         if (rs.next()) {
@@ -126,7 +135,6 @@ public class GitTest {
 
         Statement stmt = conn.createStatement();
         String sql = "INSERT INTO commits (p_id, author, committer, message, created) VALUES (" + p_id + ",'" + author + "','" + committer + "','" + message.replaceAll("'", "''") + "','" + date + "')";
-        System.out.println(sql);
         stmt.execute(sql);
         stmt.close();
     }
